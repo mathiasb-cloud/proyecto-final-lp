@@ -10,7 +10,7 @@ import com.example.demo.modelos.Usuario;
 
 @Controller
 public class UsuariosController {
-	@GetMapping("/index")
+	@GetMapping("/")
 	public String index() {
 		return "index";
 	}
