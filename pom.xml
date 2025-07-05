@@ -23,7 +23,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/x
 <artifactId>loloytaApp</artifactId>
 
 <version>0.0.1-SNAPSHOT</version>
-<packaging>war</packaging>
+
 
 <name>loloytaApp</name>
 
@@ -72,23 +72,12 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/x
 </dependency>
 
 <dependency>
-  <groupId>org.springframework.boot</groupId>
-  <artifactId>spring-boot-starter-web</artifactId>
-  <exclusions>
-    <exclusion>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-tomcat</artifactId>
-    </exclusion>
-  </exclusions>
+
+<groupId>org.springframework.boot</groupId>
+
+<artifactId>spring-boot-starter-web</artifactId>
+
 </dependency>
-
-	<dependency>
-  <groupId>org.springframework.boot</groupId>
-  <artifactId>spring-boot-starter-tomcat</artifactId>
-  <scope>provided</scope>
-</dependency>
-
-
 
 
 <dependency>
