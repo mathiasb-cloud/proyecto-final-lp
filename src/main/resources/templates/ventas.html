@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <title>Reporte de Ventas</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: url('/img/loloyta-banner1.jpg') no-repeat center center fixed;
+      background-size: cover;
+      overflow-x: hidden;
+    }
+
+    .nav-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: fixed;
+      top: 20px;
+      width: 100%;
+      z-index: 999;
+    }
+
+    .nav-content {
+      display: flex;
+      align-items: center;
+    }
+
+    .glass {
+      background: rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(3px);
+      -webkit-backdrop-filter: blur(3px);
+      border-radius: 50px;
+      padding: 12px 24px;
+      margin: 0 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #111;
+      font-weight: 500;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      min-width: 56px;
+      height: 48px;
+    }
+
+    .glass.logo {
+      padding: 0;
+      width: 48px;
+      height: 48px;
+    }
+
+    .bar-logo {
+      width: 70%;
+      height: 70%;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .bar-button {
+      text-decoration: none;
+      color: #111;
+      font-size: 1rem;
+      font-weight: 500;
+    }
+
+    .bar-button:hover {
+      text-decoration: none;
+    }
+
+    .container-content {
+      margin-top: 120px;
+      padding: 20px;
+    }
+
+    .filtro-form {
+      background: rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(10px);
+      border-radius: 24px;
+      padding: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+
+    .mesa-table {
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 24px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      overflow: hidden;
+    }
+
+    .mesa-table th {
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      border: none;
+    }
+
+    .mesa-table td {
+      border: none;
+      vertical-align: middle;
+      color: #111;
+      font-weight: 500;
+      background: rgba(255, 255, 255, 0.9);
+    }
+
+    .table-total {
+      background: rgba(255, 255, 255, 0.6);
+      font-weight: bold;
+    }
+
+    @media (max-width: 768px) {
+      .glass {
+        height: 48px;
+        padding: 10px 16px;
+      }
+
+      .glass.logo {
+        width: 48px;
+        height: 48px;
+      }
+
+      .mesa-table th,
+      .mesa-table td {
+        font-size: 0.85rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NavBar estilo Dynamic Island -->
+<div class="nav-container">
+  <div class="nav-content">
+    <div class="glass">
+      <a href="/registro" class="bar-button">Cerrar Sesión</a>
+    </div>
+    <div class="glass" style="width: 340px;">
+      <span>Reporte de Ventas</span>
+    </div>
+    <div class="glass logo">
+      <img src="../img/loloyta-logo.png" alt="Logo" class="bar-logo" />
+    </div>
+  </div>
+</div>
+
+<!-- Contenido -->
+<div class="container container-content">
+  <h2 class="text-center mb-4 fw-semibold" style="color: #fff;">Reporte de Ventas</h2>
+
+  <!-- Filtros -->
+  <div class="row mb-4 filtro-form">
+    <form method="get" th:action="@{/ventas}" class="col-md-8 d-flex flex-wrap gap-2">
+      <div>
+        <label class="form-label">Desde:</label>
+        <input type="date" name="desde" class="form-control" th:value="${desde}" />
+      </div>
+      <div>
+        <label class="form-label">Hasta:</label>
+        <input type="date" name="hasta" class="form-control" th:value="${hasta}" />
+      </div>
+      <div class="align-self-end">
+        <button type="submit" class="btn btn-primary">Filtrar</button>
+      </div>
+    </form>
+
+    <form method="get" th:action="@{/report/ventas}" class="col-md-4 text-end align-self-end">
+      <input type="hidden" name="desde" th:value="${desde}" />
+      <input type="hidden" name="hasta" th:value="${hasta}" />
+      <button type="submit" class="btn btn-danger">Generar Reporte PDF</button>
+    </form>
+  </div>
+
+  <!-- Tabla -->
+  <div class="table-responsive mesa-table">
+    <table class="table align-middle mb-0">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Pedido</th>
+          <th>Detalle</th>
+          <th>Precio</th>
+          <th>Mesa</th>
+          <th>Fecha</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:each="venta : ${ventas}">
+          <td th:text="${venta.id}">1</td>
+          <td th:text="${venta.nombre}">Ejemplo</td>
+          <td th:text="${venta.detalle}">Detalle</td>
+          <td>S/ <span th:text="${venta.precio}">0.00</span></td>
+          <td th:text="${venta.numeroMesa}">1</td>
+          <td th:text="${venta.fecha != null} ? ${T(java.time.format.DateTimeFormatter).ofPattern('dd/MM/yyyy HH:mm').format(venta.fecha)} : '---'">Fecha</td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr class="table-total">
+          <td colspan="3"><strong>Total</strong></td>
+          <td colspan="3">S/ <strong th:text="${total != null ? total : '0.00'}">0.00</strong></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+
+</body>
+</html>

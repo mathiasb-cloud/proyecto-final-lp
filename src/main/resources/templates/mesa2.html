@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mesa 2</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: url('/img/loloyta-banner1.jpg') no-repeat center center fixed;
+      background-size: cover;
+      overflow-x: hidden;
+    }
+
+    .nav-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: fixed;
+      top: 20px;
+      width: 100%;
+      z-index: 999;
+    }
+
+    .nav-content {
+      display: flex;
+      align-items: center;
+    }
+
+    .glass {
+      background: rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(3px);
+      -webkit-backdrop-filter: blur(3px);
+      border-radius: 50px;
+      padding: 12px 24px;
+      margin: 0 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #111;
+      font-weight: 500;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      min-width: 56px;
+      height: 48px;
+    }
+
+    .glass.logo {
+      padding: 0;
+      width: 48px;
+      height: 48px;
+    }
+
+    .bar-logo {
+      width: 70%;
+      height: 70%;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .bar-button {
+      text-decoration: none;
+      color: #111;
+      font-size: 1rem;
+      font-weight: 500;
+    }
+
+    .bar-button:hover {
+      text-decoration: none;
+    }
+
+    /* Botones de carta */
+    .botones-carta {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+      padding: 30px 20px 10px;
+    }
+
+    .btn-mesa {
+      padding: 10px 24px;
+      border-radius: 28px;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #111;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(12px);
+      border: none;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      transition: all 0.3s ease;
+      text-decoration: none;
+    }
+
+    .btn-mesa:hover {
+      background: rgba(255, 255, 255, 0.5);
+      transform: scale(1.05);
+    }
+
+    /* Tabla de pedidos */
+    .mesa-table {
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 24px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      overflow: hidden;
+    }
+
+    .mesa-table th {
+      background: rgba(0, 0, 0, 0.6);
+      color: white;
+      border: none;
+    }
+
+    .mesa-table td {
+      border: none;
+      vertical-align: middle;
+      color: #111;
+      font-weight: 500;
+      background: rgba(255, 255, 255, 0.9);
+    }
+
+    .mesa-table input {
+      background: rgba(255,255,255,0.4);
+      border: none;
+      border-radius: 12px;
+      padding: 4px 10px;
+    }
+
+    .mesa-table .btn-primary,
+    .mesa-table .btn-danger {
+      font-size: 0.85rem;
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-weight: 600;
+      border: none;
+    }
+
+    .mesa-table .btn-primary {
+      background-color: #6c9df0;
+    }
+
+    .mesa-table .btn-danger {
+      background-color: rgb(255, 0, 0);
+    }
+
+    .editable-row input {
+      border: 1px solid #007bff !important;
+      background-color: #f3faff !important;
+    }
+
+    /* Botones fijos sin barra detrás */
+    .botones-fijos {
+      position: fixed;
+      bottom: 20px;
+      left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      z-index: 1000;
+      pointer-events: none; /* permitir scroll */
+    }
+
+    .botones-fijos .btn {
+      pointer-events: all;
+      font-size: 1.2rem;
+      font-weight: 600;
+      border-radius: 30px;
+      padding: 10px 24px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    @media (max-width: 768px) {
+      .glass {
+        height: 48px;
+        padding: 10px 16px;
+      }
+
+      .glass.logo {
+        width: 48px;
+        height: 48px;
+      }
+
+      .mesa-table th,
+      .mesa-table td {
+        font-size: 0.85rem;
+      }
+
+      .btn-mesa {
+        font-size: 0.9rem;
+      }
+
+      .botones-fijos {
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NavBar estilo Dynamic Island -->
+<div class="nav-container">
+  <div class="nav-content">
+    <div class="glass">
+      <a href="/registro" class="bar-button">Cerrar Sesión</a>
+    </div>
+    <div class="glass" style="width: 340px;">
+      <span>Mesa 2 - Tomar Pedido</span>
+    </div>
+    <div class="glass logo">
+      <img src="../img/loloyta-logo.png" alt="Logo" class="bar-logo" />
+    </div>
+  </div>
+</div>
+
+<!-- Contenido principal -->
+<div class="container pt-5 mt-5">
+  <h2 class="text-center mb-4 fw-semibold" style="color: #f3faff;">Selecciona el pedido para Mesa 2</h2>
+
+  <!-- Botones carta -->
+  <div class="botones-carta" id="botonesCarta">
+    <!-- Agregado dinámicamente por JS -->
+  </div>
+
+  <!-- Tabla pedidos -->
+  <div class="table-responsive mt-3 mesa-table">
+    <table class="table align-middle">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Pedido</th>
+          <th>Detalle</th>
+          <th>Precio</th>
+          <th class="text-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tablaPedidos">
+        <!-- Contenido dinámico -->
+      </tbody>
+    </table>
+    <div class="text-end fw-bold mt-2 px-3 pb-3">
+      Total: S/ <span id="totalPrecio">0.00</span>
+    </div>
+  </div>
+</div>
+
+<!-- Botones Enviar y Confirmar flotantes -->
+<div class="botones-fijos">
+  <a href="#" class="btn btn-success" onclick="enviarPedidos()">Enviar</a>
+  <button class="btn btn-success" onclick="confirmarPago()">Confirmar Pago</button>
+</div>
+
+<script>
+const NOMBRE_MESA = "mesa2";
+let stompClient = null;
+let contadorPedidos = 1;
+let total = 0;
+const pedidosConfirmados = [];
+
+function conectar() {
+    const socket = new SockJS('/ws');
+    stompClient = Stomp.over(socket);
+    stompClient.connect({}, function (frame) {
+        console.log("Conectado al WebSocket (mesa): " + frame);
+
+        stompClient.subscribe("/topic/recibirPedido", msg => {
+            const pedido = JSON.parse(msg.body);
+            const numeroMesaActual = parseInt(NOMBRE_MESA.replace('mesa', ''));
+            if (pedido.numeroMesa === numeroMesaActual) {
+				
+				const filaTemporal = document.querySelector(`#tablaPedidos tr.pedido:not([data-id]) input[value='${pedido.nombre}']`)?.closest('tr');
+				if (filaTemporal) filaTemporal.remove();
+
+				agregarPedido(pedido.nombre, pedido.detalle, pedido.id, pedido.activo, pedido.precio);
+
+            }
+        });
+
+        stompClient.subscribe("/topic/estadoCambiado", msg => {
+            const { id, activo } = JSON.parse(msg.body);
+            const fila = document.querySelector(`tr[data-id='${id}']`);
+            if (fila) {
+                const btnEditar = fila.querySelector('.btn-editar');
+                const btnEliminar = fila.querySelector('.btn-danger');
+                if (btnEditar) btnEditar.disabled = !activo;
+                if (btnEliminar) btnEliminar.disabled = !activo;
+                fila.dataset.activo = activo;
+                if (!activo) {
+                    fila.classList.remove('editable-row');
+                    fila.querySelector('input[name="producto"]').setAttribute('readonly', true);
+                    fila.querySelector('input[name="detalle"]').setAttribute('readonly', true);
+                    if (btnEditar.innerText === 'Guardar') {
+                        btnEditar.innerText = 'Editar';
+                        btnEditar.onclick = function() { habilitarEdicion(this); };
+                    }
+                }
+            }
+        });
+
+        stompClient.subscribe('/topic/pedidoEliminado', function (mensaje) {
+            const idEliminado = parseInt(mensaje.body);
+            const filaAEliminar = document.querySelector(`tr[data-id="${idEliminado}"]`);
+            if (filaAEliminar) filaAEliminar.remove();
+        });
+
+        cargarPedidosDesdeServidor();
+    }, function(error) {
+        console.error("Error de conexión WebSocket en mesa:", error);
+        setTimeout(conectar, 5000);
+    });
+}
+
+function cargarCarta() {
+    fetch('/admin/carta/disponibles')
+        .then(response => response.json())
+        .then(data => {
+            const botonesCarta = document.getElementById('botonesCarta');
+            botonesCarta.innerHTML = '';
+            data.forEach(item => {
+                const boton = document.createElement('a');
+                boton.href = '#';
+                boton.className = 'btn-mesa';
+                boton.onclick = () => agregarPedido(item.nombre, '', null, true, item.precio);
+                boton.textContent = item.nombre + " - S/ " + item.precio.toFixed(2);
+                botonesCarta.appendChild(boton);
+            });
+        })
+        .catch(error => console.error('Error al cargar la carta:', error));
+}
+
+function agregarPedido(nombre, detalle = '', id = null, activo = true, precio = 0) {
+    const tabla = document.getElementById('tablaPedidos');
+
+    // 🚫 Evitar duplicados
+    if (id && document.querySelector(`#tablaPedidos tr[data-id="${id}"]`)) {
+        console.log(`Pedido con ID ${id} ya existe. No se agregará otra vez.`);
+        return;
+    }
+
+    // Crear nueva fila
+    const fila = document.createElement('tr');
+    fila.classList.add('pedido');
+
+    if (id) {
+        fila.dataset.id = id;
+    } else {
+        fila.dataset.tempId = `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    }
+
+    fila.dataset.activo = activo;
+
+    fila.innerHTML = `
+        <td>${id ?? 'Temporal'}</td>
+        <td><input type="text" name="producto" class="form-control" value="${nombre}" readonly></td>
+        <td><input type="text" name="detalle" class="form-control" value="${detalle}" placeholder="Sin cebolla, etc."></td>
+        <td>S/ ${precio.toFixed(2)}</td>
+        <td class="text-center">
+            <button class="btn btn-sm btn-primary btn-editar" onclick="habilitarEdicion(this)" ${!activo ? 'disabled' : ''}>Editar</button>
+            <button class="btn btn-sm btn-danger" onclick="marcarParaEliminar(this)" ${!activo ? 'disabled' : ''}>Eliminar</button>
+        </td>
+    `;
+
+    tabla.appendChild(fila);
+
+    // ✅ Sumar al total y registrar solo si no es duplicado
+	if (!id) {
+	    // Es temporal: no sumar al total ni registrar aún
+	    console.log("Pedido temporal, no se suma al total.");
+	} else {
+	    total += precio;
+	    document.getElementById("totalPrecio").textContent = total.toFixed(2);
+	    pedidosConfirmados.push(
+			{ nombre, 
+			  detalle, 
+			  precio ,
+			  numeroMesa: parseInt(NOMBRE_MESA.replace('mesa', ''))
+		  });
+	}
+
+
+    console.log(`Nuevo pedido ${nombre} agregado con ID: ${id ?? 'Temporal'}`);
+}
+
+
+function habilitarEdicion(button) {
+    const fila = button.closest('tr');
+    if (fila.dataset.activo === "false") {
+        alert("No se puede editar un pedido inactivo.");
+        return;
+    }
+    fila.classList.add('editable-row');
+    fila.querySelector('input[name="producto"]').removeAttribute('readonly');
+    fila.querySelector('input[name="detalle"]').removeAttribute('readonly');
+    button.innerText = 'Guardar';
+    button.onclick = function() { guardarEdicion(this); };
+}
+
+function guardarEdicion(button) {
+    const fila = button.closest('tr');
+    const id = fila.dataset.id;
+    const nuevoNombre = fila.querySelector('input[name="producto"]').value;
+    const nuevoDetalle = fila.querySelector('input[name="detalle"]').value;
+    const numeroMesa = parseInt(NOMBRE_MESA.replace('mesa', ''));
+
+    if (!id) {
+        alert("Este pedido aún no ha sido guardado.");
+        return;
+    }
+
+    const pedidoObj = {
+        id: parseInt(id),
+        nombre: nuevoNombre,
+        detalle: nuevoDetalle,
+        numeroMesa,
+        activo: fila.dataset.activo === "true"
+    };
+
+    stompClient.send("/app/actualizarPedido", {}, JSON.stringify(pedidoObj));
+    deshabilitarEdicion(fila, button);
+    alert("Pedido actualizado.");
+}
+
+function deshabilitarEdicion(fila, button) {
+    fila.classList.remove('editable-row');
+    fila.querySelector('input[name="producto"]').setAttribute('readonly', true);
+    fila.querySelector('input[name="detalle"]').setAttribute('readonly', true);
+    button.innerText = 'Editar';
+    button.onclick = function() { habilitarEdicion(this); };
+}
+
+function enviarPedidos() {
+    if (!stompClient || !stompClient.connected) {
+        alert("Conexión WebSocket no lista.");
+        return;
+    }
+
+    const pedidos = document.querySelectorAll('.pedido');
+
+    pedidos.forEach(pedido => {
+        const id = pedido.dataset.id;
+        const tempId = pedido.dataset.tempId;
+        const nombre = pedido.querySelector('input[name="producto"]').value;
+        const detalle = pedido.querySelector('input[name="detalle"]').value;
+        const precio = parseFloat(pedido.querySelector('td:nth-child(4)').innerText.replace('S/', '').trim());
+        const numeroMesa = parseInt(NOMBRE_MESA.replace('mesa', ''));
+
+        const pedidoObj = {
+            id: id ? parseInt(id) : undefined,
+            nombre,
+            detalle,
+            numeroMesa,
+            precio,
+            activo: pedido.dataset.activo === "true"
+        };
+
+        if (pedido.classList.contains('para-eliminar')) {
+            if (id) {
+                stompClient.send("/app/eliminarPedido", {}, JSON.stringify(parseInt(id)));
+            }
+            pedido.remove();
+        } else if (!id) {
+            stompClient.send("/app/enviarPedido", {}, JSON.stringify(pedidoObj));
+        } else {
+            stompClient.send("/app/actualizarPedido", {}, JSON.stringify(pedidoObj));
+        }
+    });
+
+    alert("Pedidos procesados.");
+}
+
+function cargarPedidosDesdeServidor() {
+    const numeroMesa = parseInt(NOMBRE_MESA.replace('mesa', ''));
+    const tablaPedidosBody = document.getElementById('tablaPedidos');
+    tablaPedidosBody.innerHTML = '';
+
+    fetch(`/mesa/${numeroMesa}/pedidos`)
+        .then(res => res.json())
+        .then(data => {
+            data.forEach(p => {
+                agregarPedido(p.nombre, p.detalle, p.id, p.activo, p.precio);
+            });
+        })
+        .catch(error => console.error('Error al cargar pedidos desde el servidor:', error));
+}
+
+function confirmarPago() {
+    if (pedidosConfirmados.length === 0) {
+        alert("No hay pedidos para confirmar.");
+        return;
+    }
+
+    fetch('/ventas/registrar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(pedidosConfirmados)
+    }).then(res => {
+        if (res.ok) {
+            alert("Pago confirmado.");
+            total = 0;
+            pedidosConfirmados.length = 0;
+            document.getElementById("totalPrecio").textContent = "0.00";
+            document.getElementById("tablaPedidos").innerHTML = "";
+        } else {
+            alert("Error al confirmar pago.");
+        }
+    });
+}
+
+function marcarParaEliminar(button) {
+    const fila = button.closest('tr');
+    fila.classList.add('para-eliminar');
+    fila.style.opacity = 0.5;
+    fila.querySelectorAll('button').forEach(btn => btn.disabled = true);
+}
+
+window.onload = function () {
+    conectar();
+    cargarCarta();
+};
+</script>
+
+
+
+</body>
+</html>

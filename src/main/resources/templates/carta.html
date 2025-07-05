@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <title>Gestión de Carta</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    body {
+      background: url('/img/loloyta-banner1.jpg') no-repeat center center fixed;
+      background-size: cover;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      color: #111;
+    }
+
+    .glass-table {
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(20px);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+    }
+
+    .glass-table th {
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      font-weight: bold;
+    }
+
+    .glass-table td {
+      background: rgba(255, 255, 255, 0.9);
+      color: #111;
+      vertical-align: middle;
+    }
+
+    .badge-platillo { background-color: #FF9AA2; }
+    .badge-bebida { background-color: #A0E7E5; }
+    .badge-postre { background-color: #B5EAD7; }
+
+    .btn-outline-primary, .btn-outline-danger, .btn-outline-warning {
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+<div class="container mt-5">
+  <h2 class="text-center mb-4 text-white fw-bold">Gestión de Carta</h2>
+
+  <!-- Formulario -->
+  <div class="glass-card mb-4">
+    <h5 id="tituloFormulario">Agregar Item</h5>
+    <form th:action="@{/admin/carta}" th:object="${nuevoItem}" method="post" id="formularioItem">
+      <input type="hidden" th:field="*{id}" id="inputId">
+      <div class="row g-3">
+        <div class="col-md-4">
+          <input th:field="*{nombre}" class="form-control" placeholder="Nombre" id="inputNombre" required>
+        </div>
+        <div class="col-md-3">
+          <select th:field="*{tipo}" class="form-select" id="inputTipo" required>
+            <option th:each="tipo : ${tipos}" th:value="${tipo}" th:text="${tipo.name()}"></option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <input th:field="*{precio}" type="number" step="0.01" min="0.1" class="form-control" placeholder="Precio" id="inputPrecio" required>
+        </div>
+        <div class="col-md-2 d-flex">
+          <button type="submit" class="btn btn-success flex-fill">Guardar</button>
+          <button type="button" class="btn btn-secondary ms-2" onclick="cancelarEdicion()">Cancelar</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Tabla -->
+  <div class="table-responsive glass-table">
+    <table class="table table-hover align-middle">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Tipo</th>
+          <th>Precio (S/.)</th>
+          <th>Estado</th>
+          <th class="text-end">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:each="item : ${items}">
+          <td th:text="${item.nombre}"></td>
+          <td>
+            <span class="badge rounded-pill"
+                  th:classappend="${item.tipo.name()} == 'PLATILLO' ? 'badge-platillo' : (${item.tipo.name()} == 'BEBIDA' ? 'badge-bebida' : 'badge-postre')"
+                  th:text="${item.tipo}"></span>
+          </td>
+          <td th:text="${#numbers.formatDecimal(item.precio, 1, 2)}"></td>
+          <td>
+            <span th:class="${item.disponible} ? 'badge bg-success' : 'badge bg-secondary'"
+                  th:text="${item.disponible} ? 'Disponible' : 'No disponible'"></span>
+          </td>
+          <td class="text-end">
+            <form th:action="@{'/admin/carta/toggle/' + ${item.id}}" method="post" style="display:inline;">
+              <button type="submit" class="btn btn-sm btn-outline-warning me-1">
+                <span th:text="${item.disponible} ? 'Desactivar' : 'Activar'"></span>
+              </button>
+            </form>
+            <a th:href="@{'/admin/carta/editar/' + ${item.id}}" class="btn btn-sm btn-outline-primary me-1">Editar</a>
+            <a th:href="@{'/admin/carta/eliminar/' + ${item.id}}" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Seguro que deseas eliminar este item?');">Eliminar</a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</body>
+</html>

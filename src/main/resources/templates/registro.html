@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Ingreso de Usuario - Loloyta</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .split-layout {
+            display: flex;
+            height: 100vh;
+            width: 100%;
+        }
+
+        .left {
+            flex: 1;
+            background-color: #fdf6ee;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .left img {
+            max-width: 240px;
+            height: auto;
+        }
+
+        .right {
+            flex: 1;
+            position: relative;
+            background: url('../img/fondo-derecha.jpg') no-repeat center center;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 32px;
+            padding: 40px;
+            max-width: 400px;
+            width: 90%;
+            color: white;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+        }
+
+        .glass-card h3 {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .glass-card label {
+            color: #fff;
+        }
+
+        .glass-card .form-control {
+            background-color: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: #fff;
+			border-radius: 32px;
+        }
+
+        .glass-card .form-control::placeholder {
+            color: #e0e0e0;
+        }
+
+        .glass-card .btn {
+            background-color: rgba(255, 255, 255, 0.3);
+            border: none;
+            color: white;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .glass-card .btn:hover {
+            background-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .alert {
+            background-color: rgba(255, 0, 0, 0.15);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            color: #fff;
+        }
+
+        @media (max-width: 768px) {
+            .split-layout {
+                flex-direction: column;
+            }
+
+            .left, .right {
+                flex: none;
+                height: 50vh;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="split-layout">
+    <!-- Lado izquierdo solo logo -->
+    <div class="left">
+        <img src="../img/loloyta-logo.png" alt="Logo Loloyta">
+    </div>
+
+    <!-- Lado derecho con imagen de fondo y tarjeta glass -->
+    <div class="right">
+        <div class="glass-card">
+            <h3>Ingreso de Usuario</h3>
+            <form th:action="@{/registro}" th:object="${usuario}" method="post">
+                <div class="mb-3">
+                    <label for="nombre" class="form-label">Usuario</label>
+                    <input type="text" id="nombre" class="form-control" th:field="*{nombre}" placeholder="Tu usuario" required>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Correo electrónico</label>
+                    <input type="email" id="email" class="form-control" th:field="*{email}" placeholder="correo@ejemplo.com" required>
+                </div>
+                <div class="mb-3">
+                    <label for="clave" class="form-label">Contraseña</label>
+                    <input type="password" id="clave" class="form-control" th:field="*{password}" placeholder="●●●●●●" required>
+                </div>
+                <button type="submit" class="btn btn-light w-100">Ingresar</button>
+            </form>
+
+            <div th:if="${mensaje}" class="alert alert-danger mt-3 text-center" th:text="${mensaje}"></div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

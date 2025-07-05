@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Loloyta - Inicio</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body, html {
+      height: 100%;
+      font-family: 'Segoe UI', sans-serif;
+      background: url('../img/loloyta-banner1.jpg') no-repeat center center fixed;
+      background-size: cover;
+      overflow: hidden;
+    }
+
+    .glass-container {
+      height: 100vh;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 32px;
+      padding: 40px;
+      
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      text-align: center;
+      color: white;
+    }
+
+    .glass-card h1 {
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 12px 25px;
+      margin: 10px;
+      border-radius: 32px;
+      border: none;
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      font-weight: 600;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 4px 30px rgba(0,0,0,0.1);
+      transition: background 0.3s ease;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.35);
+    }
+  </style>
+</head>
+<body>
+  <div class="glass-container">
+    <div class="glass-card">
+      <h1>Bienvenido a Loloyta</h1>
+      <a href="/registro" class="btn">Iniciar Sesión</a>
+      
+    </div>
+  </div>
+</body>
+</html>
